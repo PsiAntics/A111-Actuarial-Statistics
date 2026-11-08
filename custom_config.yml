@@ -1,0 +1,16 @@
+# The look of every A111 explainer: Grant Sanderson's black background, colour
+# saturation and centred text (from 3b1b/videos), with CMU Serif for all text.
+# scripts/render.sh and render.cmd pass this file with --config_file, so it applies
+# whichever folder ManimGL runs from. Keep machine-specific paths out of it:
+# render.cmd and manim_imports_ext.py find ffmpeg and the output folder themselves.
+camera:
+  background_color: "#000000"
+  fps: 30
+file_writer:
+  saturation: 1.5
+text:
+  font: "CMU Serif"
+  alignment: "CENTER"
+directories:
+  subdirs:
+    output: "videos"

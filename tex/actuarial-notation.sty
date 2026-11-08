@@ -1,0 +1,196 @@
+%% actuarial-notation.sty
+%% ---------------------------------------------------------------------------
+%% Sabelo's notation for actuarial and statistical symbols, collected from his
+%% CS1 / CM1 LaTeX study notes (chapters 3-8, 14, Data Analysis, Important
+%% Relationships). Every macro below is copied from those notes; where the notes
+%% had more than one version, the version used by most chapters is kept and the
+%% choice is noted.
+%%
+%% Use in a document:   \usepackage{actuarial-notation}
+%% With the TikZ extras (\circled, \stt, \underarrow):
+%%                      \usepackage[tikz]{actuarial-notation}
+%% Use in Manim:        see notation.py, which loads \usepackage[manim]{actuarial-notation}
+%%
+%% Options
+%%   tikz   load TikZ and define \circled, \stt and \underarrow.
+%%   manim  Manim typesets at 10pt; the notes are 12pt. The annuity letters are scaled
+%%          to fixed heights (\scaleto{..}{8pt}, 12pt, 13pt) chosen for 12pt pages, so
+%%          at 10pt they would come out a fifth too big next to everything else. This
+%%          option multiplies every \scaleto height by 10/12 so each symbol keeps the
+%%          proportions it has in the notes. Leave it off in 12pt documents.
+%% ---------------------------------------------------------------------------
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{actuarial-notation}[2026/11/08 v1.0 Actuarial and statistical notation]
+
+\newif\ifacn@tikz \acn@tikzfalse
+\newif\ifacn@manim \acn@manimfalse
+\DeclareOption{tikz}{\acn@tikztrue}
+\DeclareOption{manim}{\acn@manimtrue}
+\ProcessOptions\relax
+
+\RequirePackage{amsmath,amssymb,amsfonts,mathtools}
+\RequirePackage{actuarialsymbol} % \Ax, \Ax*, \ax**, \px, \qx, \termxn, \endowxn, \IA, \Ia ... (loads actuarialangle: \angl, \angln)
+\RequirePackage{scalerel}        % \scaleto, used by the annuity symbols
+\ifacn@manim                     % see the manim option above
+  \RequirePackage{letltxmacro}
+  \LetLtxMacro{\acn@scaleto}{\scaleto}
+  \renewcommand{\scaleto}[3][99in]{\acn@scaleto[#1]{#2}{\dimexpr #3 * 10 / 12\relax}}
+\fi
+\RequirePackage{stackrel}        % \stackrel{\circ}{e_x}
+\RequirePackage{leftindex}       % \leftindex (used once in Important Relationships)
+
+%% ===========================================================================
+%% 1. Statistics
+%% ===========================================================================
+
+%% Chi-square. A chi raised by its own depth so it sits on the baseline, set
+%% one size up (\large). Used as \hchi^2_{k}, \hchi_{k}^{2}.
+%% (Ten of the fourteen chapters use the \large version; four use plain size.)
+\DeclareRobustCommand{\hchi}{{\mathpalette\ihchi\relax}}
+\newcommand{\ihchi}[2]{\large\raisebox{\depth}{$#1\chi$}}
+%% Same idea, two sizes up (\Large). Defined in the notes but not used.
+\DeclareRobustCommand{\rchi}{{\mathpalette\irchi\relax}}
+\newcommand{\irchi}[2]{\Large\raisebox{\depth}{$#1\chi$}}
+
+%% Sample mean: an overline sized to the upright letter, so \xoverline{X}
+%% has a bar that doesn't overhang the italic X.
+\newcommand*{\xoverline}[1]{%
+  \mathpalette\@xoverline{#1}%
+}
+\newcommand*{\@xoverline}[2]{%
+  % #1: math style
+  % #2: input
+  \sbox0{$#1\mathrm{#2}\m@th$}%
+  \sbox2{$#1#2\m@th$}%
+  \rlap{%
+    \hbox to\wd2{%
+      \hfill
+      $\overline{%
+        \vrule width 0pt height\ht0 %
+        \kern\wd0 %
+      }$%
+    }%
+  }%
+  \copy2 %
+}
+
+%% A shorter overline with trimmed ends (e.g. \overbar{M}_x).
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-2.5mu#1\mkern-2.5mu}\mkern 1.5mu}
+
+%% "Is approximately distributed as": a ~ with a dot above and below.
+\newcommand\approxsim{\mathchoice
+  {\@approxsim {\displaystyle}      {1ex} }
+  {\@approxsim {\textstyle}         {1ex} }
+  {\@approxsim {\scriptstyle}       {.7ex}}
+  {\@approxsim {\scriptscriptstyle} {.5ex}}}
+\newcommand\@approxsim[2]{%
+  \mathrel{%
+    \ooalign{%
+      $\m@th#1\sim$\cr
+      \hidewidth$\m@th#1.$\hidewidth\cr
+      \hidewidth\raise #2 \hbox{$\m@th#1.$}\hidewidth\cr
+    }%
+  }%
+}
+
+%% Binomial coefficient: \C{n}{k}.
+\newcommand{\C}[2]{%
+    {{#1}\choose{#2}}%
+}
+
+%% ===========================================================================
+%% 2. Financial mathematics: annuities
+%% ===========================================================================
+
+%% The angle ("roof") over the term, e.g. a_{\lcroof{n}}.
+\DeclareRobustCommand{\lcroof}[1]{%
+        \hbox{\vtop{\vbox{%
+        \hrule\kern 1pt\hbox{%
+        $\scriptstyle #1$%
+        \kern 1pt}}\kern1pt}%
+        \vrule\kern1pt}}
+%% \angle{n} puts the roofed term in the subscript (replaces LaTeX's angle sign).
+\DeclareRobustCommand{\angle}[1]{%
+  _{\lcroof{#1}}}
+%% An alternative, lighter angle. Defined in the notes but not used.
+\def\annu#1{_{%
+  \vbox{\hrule height .2pt
+    \kern 1pt
+    \hbox{$\scriptstyle {#1}\kern 1pt$}%
+  }\kern-.05pt
+  \vrule width .2pt
+}}
+
+%% Annuities: \annuity{symbol}{term}{superscript}, e.g. \annuitydue{a}{n}{(m)}.
+%% The letter is scaled to a fixed height so a, \ddot{a} and \bar{a} line up.
+\DeclareRobustCommand{\annuity}[3]{\scaleto{#1}{8pt}\angle{#2}^{#3}}
+\DeclareRobustCommand{\annuitydue}[3]{\scaleto{\ddot{#1}}{12pt}\angle{#2}^{#3}}
+\DeclareRobustCommand{\cannuity}[3]{\scaleto{\bar{#1}}{12pt}\angle{#2}^{#3}}
+%% Increasing (I) and decreasing (D) annuities, discrete and continuous.
+\DeclareRobustCommand{\iannuity}[3]{(I\scaleto{#1}{8pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\iannuitydue}[3]{(I\scaleto{\ddot{#1}}{12pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\ciannuity}[3]{(I\scaleto{\bar{#1}}{10pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\cciannuity}[3]{(\scaleto{\bar I}{12pt}\scaleto{\bar{#1}}{12pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\dannuity}[3]{(D\scaleto{#1}{8pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\dannuitydue}[3]{(D\scaleto{\ddot{#1}}{12pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\cdannuity}[3]{(D\scaleto{\bar{#1}}{10pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\ccdannuity}[3]{(\scaleto{\bar D}{12pt}\scaleto{\bar{#1}}{12pt})\angle{#2}^{#3}}
+%% Deferred annuities: \defannuity{symbol}{term}{superscript}{deferral}{deferral superscript}.
+\DeclareRobustCommand{\defannuity}[5]{{}_{#4}^{#5}|\scaleto{#1}{8pt}\angle{#2}^{#3}}
+\DeclareRobustCommand{\defannuitydue}[5]{{}_{#4}^{#5}|\scaleto{\ddot{#1}}{12pt}\angle{#2}^{#3}}
+\DeclareRobustCommand{\defcannuity}[5]{{}_{#4}^{#5}|\scaleto{\bar{#1}}{12pt}\angle{#2}^{#3}}
+\DeclareRobustCommand{\defiannuity}[5]{{}_{#4}^{#5}|(I\scaleto{#1}{8pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\defiannuitydue}[5]{{}_{#4}^{#5}|(I\scaleto{\ddot{#1}}{12pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\defciannuity}[5]{{}_{#4}^{#5}|(I\scaleto{\bar{#1}}{10pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\defcciannuity}[5]{{}_{#4}^{#5}|(\scaleto{\bar I}{12pt}\scaleto{\bar{#1}}{12pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\defdannuity}[5]{{}_{#4}^{#5}|(D\scaleto{#1}{8pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\defdannuitydue}[5]{{}_{#4}^{#5}|(D\scaleto{\ddot{#1}}{8pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\defcdannuity}[5]{{}_{#4}^{#5}|(D\scaleto{\bar #1}{8pt})\angle{#2}^{#3}}
+\DeclareRobustCommand{\defccdannuity}[5]{{}_{#4}^{#5}|(\scaleto{\bar D}{12pt}\scaleto{\bar #1}{8pt})\angle{#2}^{#3}}
+%% Perpetuities: \perpetuity{superscript}, \perpetuitydue{superscript}.
+\DeclareRobustCommand{\perpetuity}[1]{\scaleto{a}{8pt}_{\infty}^{#1}}
+\DeclareRobustCommand{\perpetuitydue}[1]{\scaleto{\ddot a}{12pt}_{\infty}^{#1}}
+
+%% ===========================================================================
+%% 3. Survival models and life tables
+%% ===========================================================================
+%% Subscripts are set in \scriptscriptstyle, as in the notes.
+%% These replace LaTeX's text commands \l (the letter l-slash) and \d (dot-under
+%% accent); neither is needed in maths.
+\DeclareRobustCommand{\p}[2]{{}_{\scriptscriptstyle#2}{p}_{\scriptscriptstyle#1}}   % \p{x}{t} = tp_x
+\DeclareRobustCommand{\q}[2]{{}_{\scriptscriptstyle#2}{q}_{\scriptscriptstyle#1}}   % \q{x}{t} = tq_x
+\DeclareRobustCommand{\l}[1]{{\ell}_{\scriptsize\scriptscriptstyle#1}}             % \l{x} = l_x
+\DeclareRobustCommand{\d}[1]{{d}_{\scriptscriptstyle#1}}                           % \d{x} = d_x
+\DeclareRobustCommand{\e}[1]{{e}_{\scriptscriptstyle#1}}                           % \e{x} = curtate expectation e_x
+\DeclareRobustCommand{\m}[1]{{m}_{\scriptscriptstyle#1}}                           % \m{x} = central rate m_x
+\DeclareRobustCommand{\fom}[1]{{\mu}_{\scriptscriptstyle#1}}                       % \fom{x} = force of mortality mu_x
+\DeclareRobustCommand{\ie}[1]{(Ie)_{\scriptscriptstyle#1}}                         % \ie{x} = (Ie)_x
+\DeclareRobustCommand{\iie}[1]{(\bar{I}e)_{\scriptscriptstyle#1}}                  % \iie{x} = (bar I e)_x
+
+%% ===========================================================================
+%% 4. Text helpers
+%% ===========================================================================
+%% R code in the code font (needs the TeX Gyre Cursor font, package tex-gyre).
+\newcommand{\rfont}[1]{%
+    {\fontfamily{qcr}\selectfont {#1}}%
+}
+
+%% ===========================================================================
+%% 5. TikZ extras (load with the [tikz] option)
+%% ===========================================================================
+\ifacn@tikz
+  %% The dvisvgm driver lets Manim convert TikZ drawings without Ghostscript.
+  \@ifundefined{pgfsysdriver}{\def\pgfsysdriver{pgfsys-dvisvgm.def}}{}
+  \RequirePackage{tikz}
+  %% A circled symbol, e.g. \circled{1}; \stt{a} circles an italic letter.
+  \newcommand*\circled[1]{\tikz[baseline=(char.base)]{%
+    \node[shape=circle,draw,inner sep=0.5pt] (char) {$#1$};}}
+  \newcommand*{\stt}[1]{\circled{\raisebox{\depth}{\textit{#1}}}}
+  %% Text with an arrow underneath: \underarrow[colour]{text}.
+  \newcommand{\underarrow}[2][black]{\tikz[baseline={(N.base)}]{%
+    \node[inner sep=0, outer sep=2.5](N) {#2};
+    \draw[overlay, -latex, line width=.04em, #1]
+      ([yshift=-.14em]N.south west) -- ([yshift=-.14em]N.south east);}}
+\fi
+
+\endinput

@@ -1,0 +1,16 @@
+# Renders and logs: videos are delivered in the chat, not kept in git
+videos/
+media/
+*.mp4
+*.mov
+*.gif
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Course material never goes in this public repository
+*.pdf
+cmp/
+CMP/
