@@ -13,13 +13,14 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 clip, out = sys.argv[1], sys.argv[2]
+duration = float(subprocess.run(
+    ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", clip],
+    capture_output=True, text=True, check=True,
+).stdout)
 if len(sys.argv) > 3:
-    times = [float(t) for t in sys.argv[3].split(",")]
+    # A time past the end shows the last frame
+    times = [min(float(t), duration - 0.1) for t in sys.argv[3].split(",")]
 else:
-    duration = float(subprocess.run(
-        ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", clip],
-        capture_output=True, text=True, check=True,
-    ).stdout)
     times = [duration * (i + 0.5) / 8 for i in range(8)]
 
 frames = []

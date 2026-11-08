@@ -44,6 +44,9 @@ Code:
 - Live values with `ValueTracker`, `f_always` / `always`, `always_redraw` and `make_number_changeable`.
 - Animations: `Write`, `FadeIn(mob, shift)`, `ShowCreation`, `TransformFromCopy`, `ReplacementTransform`, `FadeTransform`, `LaggedStartMap`, `FlashAround`, `Indicate`; `TransformMatchingTex` only for small rearrangements.
 - Blank lines completely empty. No Manim Community names (`MathTex`, `Create`, `config.`).
+- Scaffolding first, as Grant does: write the `get_*` helpers that build the axes, curves and tables, then the scenes, which should then read like the storyboard.
+- `rate_func=linear` when an animation stands for time passing or a count stepping up steadily; the default smooth easing for everything else.
+- When a scene carries on from the last one, rebuild the last scene's end state with the same helpers and `self.add` it first, so the joined video has no seam.
 
 Look:
 
@@ -86,6 +89,10 @@ For the rest, write what the notes write: `\mathbb{E}[\mathbb{V}(X \mid \lambda)
 - `Axes` always cross at (0, 0), even when 0 is off a range: use `CornerAxes`.
 - An updater on a group that is never added to the scene never runs; put it on what the animation adds.
 - Random draws throw outliers past the drawn geometry; clip or redraw them.
+- `GlowDot` isn't a VMobject: group it with `Group`, not `VGroup`.
+- `arrange_in_grid` places a group's direct children, so build a table as one flat group of cells, arrange it, then regroup the cells into rows.
+- `set_opacity` on a curve also sets its fill and turns it into a filled shape: dim curves with `set_stroke(opacity=...)` and text with `set_fill(opacity=...)`.
+- A 3D `Rotate` about an axis in the screen (a flip) goes through the perspective camera, and the near half swells past the frame edges: reflect with `mob.animate.apply_matrix(M, about_point=...)` instead (`np.diag([-1, 1, 1])` for the y-axis, the swap matrix for `y = x`), which folds flat onto the mirror and out again.
 - Grant's own `custom_config.yml` has settings this ManimGL doesn't know (`invert_zoom_scroll`); don't copy it.
 
 Changing `manim_imports_ext.py` or `custom_config.yml` changes every explainer. Add to them rather than change what's there, and after a change render a frame or two of each earlier explainer with `scripts/render.sh frame` to check nothing moved.
