@@ -12,10 +12,10 @@ This repository holds the code of Sabelo's explainer videos for **ASSA A111 Actu
 
 ## What an explainer is
 
-- **One idea** a student half-understands from the notes: why a formula has its shape, what a result really says, how two ideas connect. Not a whole chapter.
-- **2 to 4 minutes**, 5 to 8 scenes, one `InteractiveScene` per beat. Bigger topics become a numbered series (02a, 02b).
-- **No narration.** Short on-screen words carry the story; the animation does the explaining.
-- **Grant's arc:** open on a concrete question or puzzle, build intuition with one specific example and pictures, pause on a "Predict:" prompt before the key reveal, derive the general result from the picture, then a summary card with the boxed result and a recall question whose answer appears after a pause.
+- **One big idea, explored properly:** what it is, why it's true, two or three examples that build on each other, the trap students fall into, and where it's used later. Bigger topics become a numbered series (02a, 02b).
+- **6 to 8 minutes** by default, up to 10 when the idea needs it, and shorter only when Sabelo asks: 10 to 15 scenes in three or four acts, one `InteractiveScene` per beat. Each act opens with a short title on screen, so the video has chapters.
+- **No narration.** Short on-screen words carry the story, so the extra length goes into animation (more worked steps, more examples, more "Predict:" pauses), not into more text to read.
+- **Grant's arc:** open on a concrete question or puzzle, build intuition with a specific example and pictures, pause on a "Predict:" prompt before each key reveal, derive the general result from the picture, then a summary card with the boxed result and a recall question whose answer appears after a pause.
 - **Exam-shaped:** the CMP's definitions, notation and parametrisations, and a worked example that feels like an exam question, with your own numbers.
 
 ## Workflow
@@ -24,7 +24,7 @@ This repository holds the code of Sabelo's explainer videos for **ASSA A111 Actu
 2. **Storyboard.** Take the next free number and create `explainers/NN-slug/README.md` from the template at the end of this file: the beats with timings, what moves and the words on screen. Send Sabelo the storyboard and wait for his go-ahead; he may change beats. If he isn't around, say what you assumed and carry on. Commit and push.
 3. **Build** `main.py` in Grant's style (below). Every number shown on screen comes from constants and functions at the top of the file. Write `check.py` beside it: it imports those, recomputes every number the scenes show, checks the maths (closed forms against numerical sums, posteriors that integrate to 1) and prints a table. See `explainers/01-credibility` for both.
 4. **Preview:** `scripts/render.sh preview explainers/NN-slug`. Read its summary: failed scenes, ManimGL warnings, and the margins from `scripts/check_video.py`. Make frame sheets of the busy moments with `~/.venvs/manim-gl/bin/python scripts/sheet.py clip.mp4 sheet.png 3,7.5,12` and look at them with Read: overlaps, clipped or tiny text, a colour on the wrong glyph, the reveal order, the numbers. Fix and re-preview only the scenes you changed. For layout, `scripts/render.sh frame explainers/NN-slug Scene -- -n 0,K` renders the frame after animation K at 1080p in seconds (the last frame is often blank once a scene fades out). Commit and push once the scenes preview cleanly.
-5. **Final:** `scripts/render.sh final explainers/NN-slug` runs `check.py`, renders every scene at 1080p30 two at a time, checks each clip and joins them into `videos/NN-slug/A111-NN-slug.mp4`. A 3 to 4 minute explainer takes about 25 minutes, so run it in the background. Then look at a frame sheet of the joined video, including the seams between scenes.
+5. **Final:** `scripts/render.sh final explainers/NN-slug` runs `check.py`, renders every scene at 1080p30 two at a time, checks each clip and joins them into `videos/NN-slug/A111-NN-slug.mp4`. Rendering takes about 7 minutes per minute of video (45 to 60 minutes for a 7-minute explainer), so run it in the background. Then look at a frame sheet of the joined video, including the seams between scenes.
 6. **Deliver:** send `A111-NN-slug.mp4` and `main.py` to Sabelo in the chat, with the idea, the length and the link to the folder on GitHub. Offer a short quiz on the idea.
 7. **Push:** in the explainer's README, set the storyboard's times to the final video's (the checks print each scene's length) and the status to final; add the explainer to the index in `README.md` and to `syllabus.md`; commit and push.
 
@@ -128,9 +128,15 @@ The CMP (ActEd) and the Core Reading (IFoA) are copyright. Use them to decide wh
 
 ## Storyboard
 
+### Act 1: Title
+
 | Time | Scene | What happens | Words on screen |
 |---|---|---|---|
 | 0:00 | SceneName | ... | ... |
+
+### Act 2: Title
+
+...
 
 ## Recall
 

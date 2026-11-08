@@ -31,7 +31,7 @@ Each explainer
 4. Send me the final 1080p MP4 and main.py here, with the link to its folder on GitHub.
 5. Commit and push at each milestone (storyboard, clean previews, final) so I can follow on GitHub, and keep the index in README.md and syllabus.md up to date.
 
-Style: 2 to 4 minutes, 1080p30, black background, CMU Serif for all text, no narration, symbols as in my LaTeX notes. Open with a question, show pictures before formulas, pause on a "Predict:" before the key reveal, and end on a boxed summary and a recall question.
+Style: 6 to 8 minutes by default (up to 10 when the idea needs it), in three or four acts, 1080p30, black background, CMU Serif for all text, no narration, symbols as in my LaTeX notes. Open with a question, show pictures before formulas, pause on a "Predict:" before each key reveal, and end on a boxed summary and a recall question.
 
 If GitHub can't be reached, make the video anyway, send me the code files, and tell me they still need pushing.
 
